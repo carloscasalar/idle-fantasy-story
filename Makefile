@@ -2,6 +2,7 @@ SHELL=/bin/bash -e -o pipefail
 
 # constants
 REVIVE_VERSION = v1.3.4
+PROTOC_GEN_LINT_VERSION=v0.3.0
 DOCKER_REPO = api
 DOCKER_TAG = latest
 
@@ -24,6 +25,10 @@ docker: ## Builds docker image
 lint: ## Lints all code with revive
 	@go install github.com/mgechev/revive@$(REVIVE_VERSION)
 	@revive -config revive.toml -formatter friendly ./...
+
+lint-proto: ## Lints all proto files
+	@go install github.com/ckaznocha/protoc-gen-lint@$(PROTOC_GEN_LINT_VERSION)
+	@bash scripts/lint-proto.sh
 
 lint-reports: out/lint.xml
 
