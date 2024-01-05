@@ -22,6 +22,10 @@ out/bin:
 docker: ## Builds docker image
 	docker buildx build -t $(DOCKER_REPO):$(DOCKER_TAG) .
 
+.PHONY: generate-proto
+generate-proto: ## Generates Go server code from .proto files
+	@bash scripts/generate-proto-go.sh
+
 lint: ## Lints all code with revive
 	@go install github.com/mgechev/revive@$(REVIVE_VERSION)
 	@revive -config revive.toml -formatter friendly ./...
