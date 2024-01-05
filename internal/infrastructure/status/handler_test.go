@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/carloscasalar/gin-starter/internal/infrastructure/status"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/status"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -1,4 +1,4 @@
-module github.com/carloscasalar/gin-starter
+module github.com/carloscasalar/idle-fantasy-story
 
 go 1.21.3
 

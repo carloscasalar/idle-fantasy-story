@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/carloscasalar/gin-starter/internal/infrastructure/middleware"
-	"github.com/carloscasalar/gin-starter/internal/infrastructure/status"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/middleware"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/status"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 )

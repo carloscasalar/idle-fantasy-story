@@ -1,6 +1,5 @@
-# gin-starter
-Just a starter for [Gin](https://gin-gonic.com/) projects.
-It uses [logrus](https://github.com/sirupsen/logrus) for logging.
+# idle-fantasy-story
+This is meant to be a service that generates a random fantasy story. It will stream the story to all clients.
 
 ## Env vars
 | Name                  | Description                                    | Default |

@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/carloscasalar/gin-starter/internal/infrastructure/app"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/app"
 	log "github.com/sirupsen/logrus"
 )
 
