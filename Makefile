@@ -26,8 +26,8 @@ lint: ## Lints all code with revive
 	@go install github.com/mgechev/revive@$(REVIVE_VERSION)
 	@revive -config revive.toml -formatter friendly ./...
 
+.PHONY: lint-proto
 lint-proto: ## Lints all proto files
-	@go install github.com/ckaznocha/protoc-gen-lint@$(PROTOC_GEN_LINT_VERSION)
 	@bash scripts/lint-proto.sh
 
 lint-reports: out/lint.xml
