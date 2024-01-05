@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+import "year.proto";
+
+package idlefantasystory.v1;
+
+// The story telling service definition.
+service StoryService {
+  // Retrieves the current state of the world.
+  rpc GetWorldState (WorldStateRequest) returns (WorldStateResponse) {}
+}
+
+// Request message for GetWorldState.
+message WorldStateRequest {
+  // The ID of the world.
+  string world_id = 1;
+}
+
+// Response message for GetWorldState.
+message WorldStateResponse {
+  // The ID of the world.
+  string world_id = 1;
+  // The name of the world.
+  string world_name = 2;
+  // Current year of the world.
+  YearV1 year = 4;
+  // Current day of the year.
+  uint32 dayOfYear = 5;
+}

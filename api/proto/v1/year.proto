@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package idlefantasystory.v1;
+
+// Year message with a number and an optional suffix.
+message YearV1 {
+  // Year number.
+  int32 number = 1;
+  // Suffix of the year. It can be acronyms like BC or something more elaborate like "year of the phoenix" or nothing at all.
+  string suffix = 2;
+}
