@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/middleware"
@@ -30,13 +31,24 @@ func (i *Instance) Start(ctx context.Context) error {
 	}
 	log.WithContext(ctx).Debugf("Api configuration: %v", i.config)
 
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go i.startRestService(ctx, &wg)
+	wg.Wait()
+	return nil
+}
+
+func (i *Instance) Stop(ctx context.Context) error {
+	return i.srv.Shutdown(ctx)
+}
+
+func (i *Instance) startRestService(ctx context.Context, wg *sync.WaitGroup) {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
 	router.Use(
 		middleware.StructuredLogger(),
 		gin.Recovery(),
 	)
-
 	v1 := router.Group("/v1")
 	v1.GET("/status", status.Handler)
 
@@ -47,15 +59,9 @@ func (i *Instance) Start(ctx context.Context) error {
 		Handler:           router,
 		ReadHeaderTimeout: readHeaderSecondsTimeout * time.Second,
 	}
-
 	log.WithContext(ctx).Infof("Server started listening on port %v", i.config.Port)
 	if err := i.srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
-		return err
+		log.WithContext(ctx).Errorf("error starting REST server: %v", err)
 	}
-
-	return nil
-}
-
-func (i *Instance) Stop(ctx context.Context) error {
-	return i.srv.Shutdown(ctx)
+	wg.Done()
 }
