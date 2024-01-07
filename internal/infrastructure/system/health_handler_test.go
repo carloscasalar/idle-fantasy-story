@@ -1,4 +1,4 @@
-package status_test
+package system_test
 
 import (
 	"encoding/json"
@@ -7,18 +7,18 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/status"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/system"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestStatusHandler(t *testing.T) {
-	t.Run("status should be 200", func(t *testing.T) {
+	t.Run("/healthz should be 200", func(t *testing.T) {
 		ts := httptest.NewServer(setupServer())
 		defer ts.Close()
 
-		resp, err := http.Get(fmt.Sprintf("%s/status", ts.URL))
+		resp, err := http.Get(fmt.Sprintf("%s/healthz", ts.URL))
 
 		require.NoError(t, err)
 		require.NotNil(t, resp)
@@ -29,7 +29,7 @@ func TestStatusHandler(t *testing.T) {
 		ts := httptest.NewServer(setupServer())
 		defer ts.Close()
 
-		resp, err := http.Get(fmt.Sprintf("%s/status", ts.URL))
+		resp, err := http.Get(fmt.Sprintf("%s/healthz", ts.URL))
 
 		require.NoError(t, err)
 		require.NotNil(t, resp)
@@ -51,7 +51,8 @@ func setupServer() http.Handler {
 	r := gin.New()
 	r.Use(gin.Recovery())
 
-	r.GET("/status", status.Handler)
+	service := system.NewService()
+	service.RegisterService(r.Group("/"))
 	return r
 }
 

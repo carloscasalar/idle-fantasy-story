@@ -1,4 +1,4 @@
-package status
+package system
 
 import (
 	"net/http"
@@ -6,6 +6,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Handler(c *gin.Context) {
+func HealthHandler(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "server is ready and healthy"})
 }

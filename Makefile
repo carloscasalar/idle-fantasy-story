@@ -2,7 +2,6 @@ SHELL=/bin/bash -e -o pipefail
 
 # constants
 REVIVE_VERSION = v1.3.4
-PROTOC_GEN_LINT_VERSION=v0.3.0
 DOCKER_REPO = api
 DOCKER_TAG = latest
 

@@ -7,7 +7,6 @@ This is meant to be a service that generates a random fantasy story. It will str
 | `API_PORT`            | Port to listen to                              | 8080    |
 | `API_LOG_FORMATTER`   | Log formatter to use. Can be `json` or `text`. | json    |
 | `API_LOG_LEVEL`       | Log level to use                               | info    |
-| `API_GRPC_PORT`       | Port to listen to for gRPC                     | 5005    |
 
 ## Start the service
 To start the server you can use make:
@@ -25,10 +24,10 @@ You can use the `grpcurl` tool to call the endpoints.
 
 This way you can discover the grpc endpoints:
 ```bash
-grpcurl -plaintext localhost:5005 list  
+grpcurl -plaintext localhost:8080 list  
 ```
 
 And you can call the endpoints like this:
 ```bash
-grpcurl -plaintext -d '{"world_id": "your_world_id"}' localhost:5005 idlefantasystory.v1.StoryService/GetWorldState
+grpcurl -plaintext -d '{"world_id": "your_world_id"}' localhost:8080 idlefantasystory.v1.StoryService/GetWorldState
 ```
