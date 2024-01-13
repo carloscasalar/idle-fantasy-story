@@ -12,11 +12,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type storyService struct {
+type routes struct {
 	idlefantasystoryv1connect.UnimplementedStoryServiceHandler
 }
 
-func (s *storyService) RegisterService(g *gin.RouterGroup) {
+func (s *routes) Register(g *gin.RouterGroup) {
 	path, handler := idlefantasystoryv1connect.NewStoryServiceHandler(s, connect.WithInterceptors(
 	// TODO add interceptors
 	))
@@ -30,7 +30,7 @@ func (s *storyService) RegisterService(g *gin.RouterGroup) {
 	g.POST(fmt.Sprintf("%v/ServerReflectionInfo", pathV1Alpha), gin.WrapH(handlerV1Alpha))
 }
 
-func (s *storyService) GetWorldState(
+func (s *routes) GetWorldState(
 	ctx context.Context,
 	req *connect.Request[idlefantasystoryv1.GetWorldStateRequest],
 ) (*connect.Response[idlefantasystoryv1.GetWorldStateResponse], error) {

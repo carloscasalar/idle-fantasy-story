@@ -44,11 +44,11 @@ func (i *Instance) Start(ctx context.Context) error {
 
 	rootPath := router.Group("/")
 
-	story := new(storyService)
-	story.RegisterService(rootPath)
+	appRoutes := new(routes)
+	appRoutes.Register(rootPath)
 
-	systemService := system.NewService()
-	systemService.RegisterService(rootPath)
+	systemRoutes := system.NewRoutes()
+	systemRoutes.Register(rootPath)
 
 	i.srv = &http.Server{
 		Addr:              fmt.Sprintf(":%v", i.config.Port),

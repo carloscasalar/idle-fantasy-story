@@ -51,8 +51,8 @@ func setupServer() http.Handler {
 	r := gin.New()
 	r.Use(gin.Recovery())
 
-	service := system.NewService()
-	service.RegisterService(r.Group("/"))
+	service := system.NewRoutes()
+	service.Register(r.Group("/"))
 	return r
 }
 
