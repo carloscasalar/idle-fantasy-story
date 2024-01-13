@@ -29,5 +29,5 @@ grpcurl -plaintext localhost:8080 list
 
 And you can call the endpoints like this:
 ```bash
-grpcurl -plaintext -d '{"world_id": "your_world_id"}' localhost:8080 idlefantasystory.v1.StoryService/GetWorldState
+grpcurl -plaintext -d '{}' localhost:8080 idlefantasystory.v1.StoryService/GetWorlds
 ```

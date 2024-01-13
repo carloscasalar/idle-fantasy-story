@@ -33,21 +33,20 @@ const (
 // reflection-formatted method names, remove the leading slash and convert the remaining slash to a
 // period.
 const (
-	// StoryServiceGetWorldStateProcedure is the fully-qualified name of the StoryService's
-	// GetWorldState RPC.
-	StoryServiceGetWorldStateProcedure = "/idlefantasystory.v1.StoryService/GetWorldState"
+	// StoryServiceGetWorldsProcedure is the fully-qualified name of the StoryService's GetWorlds RPC.
+	StoryServiceGetWorldsProcedure = "/idlefantasystory.v1.StoryService/GetWorlds"
 )
 
 // These variables are the protoreflect.Descriptor objects for the RPCs defined in this package.
 var (
-	storyServiceServiceDescriptor             = v1.File_idlefantasystory_v1_idlefantasystory_proto.Services().ByName("StoryService")
-	storyServiceGetWorldStateMethodDescriptor = storyServiceServiceDescriptor.Methods().ByName("GetWorldState")
+	storyServiceServiceDescriptor         = v1.File_idlefantasystory_v1_idlefantasystory_proto.Services().ByName("StoryService")
+	storyServiceGetWorldsMethodDescriptor = storyServiceServiceDescriptor.Methods().ByName("GetWorlds")
 )
 
 // StoryServiceClient is a client for the idlefantasystory.v1.StoryService service.
 type StoryServiceClient interface {
-	// Retrieves the current state of the world.
-	GetWorldState(context.Context, *connect.Request[v1.GetWorldStateRequest]) (*connect.Response[v1.GetWorldStateResponse], error)
+	// Retrieves list of worlds.
+	GetWorlds(context.Context, *connect.Request[v1.GetWorldsRequest]) (*connect.Response[v1.GetWorldsResponse], error)
 }
 
 // NewStoryServiceClient constructs a client for the idlefantasystory.v1.StoryService service. By
@@ -60,10 +59,10 @@ type StoryServiceClient interface {
 func NewStoryServiceClient(httpClient connect.HTTPClient, baseURL string, opts ...connect.ClientOption) StoryServiceClient {
 	baseURL = strings.TrimRight(baseURL, "/")
 	return &storyServiceClient{
-		getWorldState: connect.NewClient[v1.GetWorldStateRequest, v1.GetWorldStateResponse](
+		getWorlds: connect.NewClient[v1.GetWorldsRequest, v1.GetWorldsResponse](
 			httpClient,
-			baseURL+StoryServiceGetWorldStateProcedure,
-			connect.WithSchema(storyServiceGetWorldStateMethodDescriptor),
+			baseURL+StoryServiceGetWorldsProcedure,
+			connect.WithSchema(storyServiceGetWorldsMethodDescriptor),
 			connect.WithClientOptions(opts...),
 		),
 	}
@@ -71,18 +70,18 @@ func NewStoryServiceClient(httpClient connect.HTTPClient, baseURL string, opts .
 
 // storyServiceClient implements StoryServiceClient.
 type storyServiceClient struct {
-	getWorldState *connect.Client[v1.GetWorldStateRequest, v1.GetWorldStateResponse]
+	getWorlds *connect.Client[v1.GetWorldsRequest, v1.GetWorldsResponse]
 }
 
-// GetWorldState calls idlefantasystory.v1.StoryService.GetWorldState.
-func (c *storyServiceClient) GetWorldState(ctx context.Context, req *connect.Request[v1.GetWorldStateRequest]) (*connect.Response[v1.GetWorldStateResponse], error) {
-	return c.getWorldState.CallUnary(ctx, req)
+// GetWorlds calls idlefantasystory.v1.StoryService.GetWorlds.
+func (c *storyServiceClient) GetWorlds(ctx context.Context, req *connect.Request[v1.GetWorldsRequest]) (*connect.Response[v1.GetWorldsResponse], error) {
+	return c.getWorlds.CallUnary(ctx, req)
 }
 
 // StoryServiceHandler is an implementation of the idlefantasystory.v1.StoryService service.
 type StoryServiceHandler interface {
-	// Retrieves the current state of the world.
-	GetWorldState(context.Context, *connect.Request[v1.GetWorldStateRequest]) (*connect.Response[v1.GetWorldStateResponse], error)
+	// Retrieves list of worlds.
+	GetWorlds(context.Context, *connect.Request[v1.GetWorldsRequest]) (*connect.Response[v1.GetWorldsResponse], error)
 }
 
 // NewStoryServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -91,16 +90,16 @@ type StoryServiceHandler interface {
 // By default, handlers support the Connect, gRPC, and gRPC-Web protocols with the binary Protobuf
 // and JSON codecs. They also support gzip compression.
 func NewStoryServiceHandler(svc StoryServiceHandler, opts ...connect.HandlerOption) (string, http.Handler) {
-	storyServiceGetWorldStateHandler := connect.NewUnaryHandler(
-		StoryServiceGetWorldStateProcedure,
-		svc.GetWorldState,
-		connect.WithSchema(storyServiceGetWorldStateMethodDescriptor),
+	storyServiceGetWorldsHandler := connect.NewUnaryHandler(
+		StoryServiceGetWorldsProcedure,
+		svc.GetWorlds,
+		connect.WithSchema(storyServiceGetWorldsMethodDescriptor),
 		connect.WithHandlerOptions(opts...),
 	)
 	return "/idlefantasystory.v1.StoryService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case StoryServiceGetWorldStateProcedure:
-			storyServiceGetWorldStateHandler.ServeHTTP(w, r)
+		case StoryServiceGetWorldsProcedure:
+			storyServiceGetWorldsHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -110,6 +109,6 @@ func NewStoryServiceHandler(svc StoryServiceHandler, opts ...connect.HandlerOpti
 // UnimplementedStoryServiceHandler returns CodeUnimplemented from all methods.
 type UnimplementedStoryServiceHandler struct{}
 
-func (UnimplementedStoryServiceHandler) GetWorldState(context.Context, *connect.Request[v1.GetWorldStateRequest]) (*connect.Response[v1.GetWorldStateResponse], error) {
-	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("idlefantasystory.v1.StoryService.GetWorldState is not implemented"))
+func (UnimplementedStoryServiceHandler) GetWorlds(context.Context, *connect.Request[v1.GetWorldsRequest]) (*connect.Response[v1.GetWorldsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("idlefantasystory.v1.StoryService.GetWorlds is not implemented"))
 }

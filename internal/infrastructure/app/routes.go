@@ -30,11 +30,10 @@ func (s *routes) Register(g *gin.RouterGroup) {
 	g.POST(fmt.Sprintf("%v/ServerReflectionInfo", pathV1Alpha), gin.WrapH(handlerV1Alpha))
 }
 
-func (s *routes) GetWorldState(
+func (s *routes) GetWorlds(
 	ctx context.Context,
-	req *connect.Request[idlefantasystoryv1.GetWorldStateRequest],
-) (*connect.Response[idlefantasystoryv1.GetWorldStateResponse], error) {
-	id := req.Msg.GetWorldId()
-	log.WithContext(ctx).Infof("GetWorldState request received for world %v", id)
-	return connect.NewResponse(&idlefantasystoryv1.GetWorldStateResponse{}), nil
+	_ *connect.Request[idlefantasystoryv1.GetWorldsRequest],
+) (*connect.Response[idlefantasystoryv1.GetWorldsResponse], error) {
+	log.WithContext(ctx).Info("GetWorlds request received for world")
+	return connect.NewResponse(&idlefantasystoryv1.GetWorldsResponse{}), nil
 }

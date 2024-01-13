@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package idlefantasystory.v1;
+
+// World entity. Use to be something like a planet or a continent.
+message World {
+    // Unique identifier of the world.
+    string world_id = 1;
+    // Name of the world.
+    string name = 2;
+}

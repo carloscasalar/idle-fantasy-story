@@ -5,7 +5,7 @@ go 1.21.5
 require (
 	connectrpc.com/connect v1.14.0
 	connectrpc.com/grpcreflect v1.2.0
-	github.com/carloscasalar/idle-fantasy-story/pkg/idlefantasystory v0.0.0-20240105220245-015a00674bfc
+	github.com/carloscasalar/idle-fantasy-story/pkg/idlefantasystory v0.0.0-20240113163728-61c05b7946f0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/sirupsen/logrus v1.9.3
