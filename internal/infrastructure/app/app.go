@@ -7,6 +7,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/carloscasalar/idle-fantasy-story/internal/application/world"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/handlers"
+	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/storage/inmemory"
+
 	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/middleware"
 	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/system"
 	"github.com/gin-gonic/gin"
@@ -42,9 +46,16 @@ func (i *Instance) Start(ctx context.Context) error {
 		gin.Recovery(),
 	)
 
+	repository, err := inmemory.NewRepository(ctx)
+	if err != nil {
+		return err
+	}
+
+	getWorldsUseCase := world.NewGetWorlds(repository)
+
 	rootPath := router.Group("/")
 
-	appRoutes := new(routes)
+	appRoutes := handlers.NewRoutes(getWorldsUseCase)
 	appRoutes.Register(rootPath)
 
 	systemRoutes := system.NewRoutes()

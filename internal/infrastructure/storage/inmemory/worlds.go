@@ -38,7 +38,8 @@ func initWorlds() (map[string]domain.World, error) {
 }
 
 func parseYmlWorlds() ([]serializableWorld, error) {
-	file, err := os.ReadFile("worlds.yml")
+	//TODO move to an assets folder and parametrize the route
+	file, err := os.ReadFile("internal/infrastructure/storage/inmemory/worlds.yml")
 	if err != nil {
 		return nil, fmt.Errorf("error reading worlds file: %w", err)
 	}
