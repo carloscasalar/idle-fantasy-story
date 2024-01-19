@@ -9,7 +9,7 @@ type ErrorType int
 
 const (
 	UnexpectedError ErrorType = iota
-	InvalidRequest
+	ValidationError
 	LogicError
 )
 
@@ -29,9 +29,9 @@ func NewUnexpectedError(message string) *Error {
 	}
 }
 
-func NewInvalidRequestError(message string) *Error {
+func NewValidationError(message string) *Error {
 	return &Error{
-		errorType: InvalidRequest,
+		errorType: ValidationError,
 		message:   message,
 	}
 }
