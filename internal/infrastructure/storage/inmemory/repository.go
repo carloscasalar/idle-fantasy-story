@@ -16,7 +16,7 @@ type Repository struct {
 type Opt func(*Repository) error
 
 func NewRepository(ctx context.Context, worldsFilePath string) (*Repository, error) {
-	worlds, err := initWorlds(worldsFilePath)
+	worlds, err := newWorldsLoader(worldsFilePath).load()
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("error initializing worlds")
 		return nil, ErrUnableToParseYmlWorlds

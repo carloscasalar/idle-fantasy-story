@@ -1,11 +1,6 @@
 package inmemory
 
 import (
-	"fmt"
-	"os"
-
-	"gopkg.in/yaml.v3"
-
 	"github.com/carloscasalar/idle-fantasy-story/internal/domain"
 )
 
@@ -23,27 +18,4 @@ func (sw serializableWorld) toDomain() domain.World {
 
 type Worlds struct {
 	Worlds []serializableWorld `yaml:"worlds"`
-}
-
-func initWorlds(worldsFilePath string) (map[string]domain.World, error) {
-	rawWorlds, err := parseYmlWorlds(worldsFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("error parsing yml worlds: %w", err)
-	}
-	worlds := make(map[string]domain.World, len(rawWorlds))
-	for _, world := range rawWorlds {
-		worlds[world.ID] = world.toDomain()
-	}
-	return worlds, nil
-}
-
-func parseYmlWorlds(worldsFilePath string) ([]serializableWorld, error) {
-	file, err := os.ReadFile(worldsFilePath)
-	if err != nil {
-		return nil, fmt.Errorf("error reading worlds file: %w", err)
-	}
-
-	worlds := Worlds{}
-	err = yaml.Unmarshal(file, &worlds)
-	return worlds.Worlds, nil
 }
