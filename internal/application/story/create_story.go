@@ -9,6 +9,6 @@ func NewCreateStory() (*CreateStory, error) {
 	return &CreateStory{}, nil
 }
 
-func (c *CreateStory) Execute(ctx context.Context, request CreateStoryRequest) error {
+func (c *CreateStory) Execute(_ context.Context, _ CreateStoryRequest) error {
 	return ErrWorldIDIsRequired
 }
