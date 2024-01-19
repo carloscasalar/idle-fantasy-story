@@ -1,5 +1,6 @@
 package story
 
 type CreateStoryRequest struct {
-	WorldID string
+	WorldID   string
+	PartySize *uint8
 }
