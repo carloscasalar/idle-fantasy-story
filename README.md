@@ -2,11 +2,12 @@
 This is meant to be a service that generates a random fantasy story. It will stream the story to all clients.
 
 ## Env vars
-| Name                  | Description                                    | Default |
-|-----------------------|------------------------------------------------|---------|
-| `API_PORT`            | Port to listen to                              | 8080    |
-| `API_LOG_FORMATTER`   | Log formatter to use. Can be `json` or `text`. | json    |
-| `API_LOG_LEVEL`       | Log level to use                               | info    |
+| Name                               | Description                                    | Default                          |
+|------------------------------------|------------------------------------------------|----------------------------------|
+| `API_PORT`                         | Port to listen to                              | 8080                             |
+| `API_LOG_FORMATTER`                | Log formatter to use. Can be `json` or `text`. | json                             |
+| `API_LOG_LEVEL`                    | Log level to use                               | info                             |
+| `API_MEMORYSTORAGE_WORLDSFILEPATH` | Path to the file that contains the worlds      | init/storage/inmemory/worlds.yml |
 
 ## Start the service
 To start the server you can use make:

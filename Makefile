@@ -43,11 +43,15 @@ test: ## Runs all tests
 
 run: export API_LOG_FORMATTER=text
 run: export API_LOG_LEVEL=debug
+run: export API_MEMORYSTORAGE_WORLDSFILEPATH=init/storage/inmemory/worlds.yml
 run: ## Runs the application at 8080 port
 	@go run cmd/api/main.go
 
-run-docker: fmt build docker ## Runs the trick inside docker
-	docker run --rm -it -p8080:8080 --env API_LOG_FORMATTER="text" $(DOCKER_REPO):$(DOCKER_TAG)
+run-docker: ## Runs the api inside docker
+	docker run --rm -it -p8080:8080 \
+               --env API_LOG_FORMATTER="text" \
+               --env API_MEMORYSTORAGE_WORLDSFILEPATH="/go/bin/data/worlds.yml" \
+               $(DOCKER_REPO):$(DOCKER_TAG)
 
 coverage: out/report.json ## Displays coverage per func on cli
 	@go tool cover -func=out/cover.out

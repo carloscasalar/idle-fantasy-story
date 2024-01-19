@@ -46,7 +46,7 @@ func (i *Instance) Start(ctx context.Context) error {
 		gin.Recovery(),
 	)
 
-	repository, err := inmemory.NewRepository(ctx)
+	repository, err := inmemory.NewRepository(ctx, i.config.MemoryStorage.WorldsFilePath)
 	if err != nil {
 		return err
 	}

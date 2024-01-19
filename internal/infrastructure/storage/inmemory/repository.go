@@ -13,8 +13,10 @@ type Repository struct {
 	store *sync.Map
 }
 
-func NewRepository(ctx context.Context) (*Repository, error) {
-	worlds, err := initWorlds()
+type Opt func(*Repository) error
+
+func NewRepository(ctx context.Context, worldsFilePath string) (*Repository, error) {
+	worlds, err := initWorlds(worldsFilePath)
 	if err != nil {
 		log.WithContext(ctx).WithError(err).Error("error initializing worlds")
 		return nil, ErrUnableToParseYmlWorlds

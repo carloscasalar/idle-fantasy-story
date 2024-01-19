@@ -25,8 +25,8 @@ type Worlds struct {
 	Worlds []serializableWorld `yaml:"worlds"`
 }
 
-func initWorlds() (map[string]domain.World, error) {
-	rawWorlds, err := parseYmlWorlds()
+func initWorlds(worldsFilePath string) (map[string]domain.World, error) {
+	rawWorlds, err := parseYmlWorlds(worldsFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("error parsing yml worlds: %w", err)
 	}
@@ -37,9 +37,8 @@ func initWorlds() (map[string]domain.World, error) {
 	return worlds, nil
 }
 
-func parseYmlWorlds() ([]serializableWorld, error) {
-	//TODO move to an assets folder and parametrize the route
-	file, err := os.ReadFile("internal/infrastructure/storage/inmemory/worlds.yml")
+func parseYmlWorlds(worldsFilePath string) ([]serializableWorld, error) {
+	file, err := os.ReadFile(worldsFilePath)
 	if err != nil {
 		return nil, fmt.Errorf("error reading worlds file: %w", err)
 	}
