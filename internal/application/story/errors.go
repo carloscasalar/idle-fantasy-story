@@ -1,8 +1,10 @@
 package story
 
-import "errors"
+import (
+	"github.com/carloscasalar/idle-fantasy-story/internal/application"
+)
 
 var (
 	// ErrWorldIDIsRequired is returned when a world ID is not provided
-	ErrWorldIDIsRequired = errors.New("world ID is required to create a new story")
+	ErrWorldIDIsRequired = application.NewValidationError("world ID is required to create a new story")
 )
