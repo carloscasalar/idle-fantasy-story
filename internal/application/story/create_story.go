@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/carloscasalar/idle-fantasy-story/internal/application"
 
 	"github.com/carloscasalar/idle-fantasy-story/internal/domain"
@@ -21,7 +23,7 @@ func NewCreateStory(worldRepository Repository) (*CreateStory, error) {
 	return &CreateStory{worldRepository}, nil
 }
 
-func (c *CreateStory) Execute(_ context.Context, req CreateStoryRequest) (*StoryDTO, error) {
+func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*StoryDTO, error) {
 	if err := c.validateWorldID(req.WorldID); err != nil {
 		return nil, err
 	}
@@ -31,10 +33,13 @@ func (c *CreateStory) Execute(_ context.Context, req CreateStoryRequest) (*Story
 	}
 
 	_, err := c.worldRepository.GetWorldByID(context.Background(), domain.WorldID(req.WorldID))
-	if err != nil && errors.Is(err, domain.ErrWorldDoesNotExist) {
-		return nil, application.ErrWorldDoesNotExist
+	if err != nil {
+		if errors.Is(err, domain.ErrWorldDoesNotExist) {
+			return nil, application.ErrWorldDoesNotExist
+		}
+		log.WithContext(ctx).WithError(err).Error("unexpected error finding world by ID")
+		return nil, application.ErrInternalServer
 	}
-
 	return nil, nil
 }
 

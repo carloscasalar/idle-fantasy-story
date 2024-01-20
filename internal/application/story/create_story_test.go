@@ -2,6 +2,7 @@ package story_test
 
 import (
 	"context"
+	"errors"
 	"testing"
 
 	"github.com/carloscasalar/idle-fantasy-story/internal/application"
@@ -57,6 +58,17 @@ func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing
 	assert.ErrorIs(t, err, application.ErrWorldDoesNotExist)
 }
 
+func TestCreateStory_when_unexpected_error_happens_querying_world_repository_it_should_return_internal_error(t *testing.T) {
+	// Given
+	createStory := newCreateStoryUseCase(t)
+
+	// When
+	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("unexpected-error"))
+
+	// Then
+	assert.ErrorIs(t, err, application.ErrInternalServer)
+}
+
 func newCreateStoryUseCase(t *testing.T) *story.CreateStory {
 	createStory, err := story.NewCreateStory(new(mockWorldRepository))
 	require.NoError(t, err)
@@ -84,12 +96,16 @@ type mockWorldRepository struct {
 }
 
 func (m mockWorldRepository) GetWorldByID(_ context.Context, worldID domain.WorldID) (*domain.World, error) {
-	if worldID == "non-existing-world-id" {
+	switch worldID {
+	case "unexpected-error":
+		return nil, errors.New("unexpected error")
+	case "non-existing-world-id":
 		return nil, domain.ErrWorldDoesNotExist
-	}
+	default:
+		return new(domain.WorldBuilder).
+			WithID(worldID).
+			WithName("a world name").
+			Build(), nil
 
-	return new(domain.WorldBuilder).
-		WithID(worldID).
-		WithName("a world name").
-		Build(), nil
+	}
 }
