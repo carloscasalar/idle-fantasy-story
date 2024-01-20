@@ -1,17 +1,17 @@
-package application
-
-var (
-	// ErrInternalServer is returned when an unexpected error occurs
-	ErrInternalServer    = NewUnexpectedError("internal server error")
-	ErrWorldDoesNotExist = NewValidationError("world does not exist")
-)
+package domain
 
 type ErrorType int
+
+var (
+	// ErrWorldDoesNotExist is returned when a world does not exist
+	ErrWorldDoesNotExist = NewResourceDoesNotExistError("world does not exist")
+)
 
 const (
 	UnexpectedError ErrorType = iota
 	ValidationError
 	LogicError
+	ResourceDoesNotExistError
 )
 
 type Error struct {
@@ -40,6 +40,13 @@ func NewValidationError(message string) *Error {
 func NewLogicError(message string) *Error {
 	return &Error{
 		errorType: LogicError,
+		message:   message,
+	}
+}
+
+func NewResourceDoesNotExistError(message string) *Error {
+	return &Error{
+		errorType: ResourceDoesNotExistError,
 		message:   message,
 	}
 }
