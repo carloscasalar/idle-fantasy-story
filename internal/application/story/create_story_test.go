@@ -24,9 +24,9 @@ func TestCreateStory_should_require_a_world(t *testing.T) {
 	assert.ErrorIs(t, err, story.ErrWorldIDIsRequired)
 }
 
-func TestCreateStory_when_specified_number_of_characters(t *testing.T) {
+func TestCreateStory_when_specified_party_size(t *testing.T) {
 	testCases := map[string]struct {
-		numberOfCharacters uint8
+		partySize uint8
 	}{
 		"should not be less than 3":    {2},
 		"should not be greater than 6": {7},
@@ -38,7 +38,7 @@ func TestCreateStory_when_specified_number_of_characters(t *testing.T) {
 			createStory := newCreateStoryUseCase(t)
 
 			// When
-			_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(tc.numberOfCharacters))
+			_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(tc.partySize))
 
 			// Then
 			assert.ErrorIs(t, err, story.ErrInvalidPartySize)
