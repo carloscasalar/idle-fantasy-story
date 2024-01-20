@@ -80,7 +80,8 @@ func TestCreateStory_should_persist_a_new_story_with_the_specified_world(t *test
 
 	// Then
 	require.NoError(t, err)
-	assert.Equal(t, "a-world-id", *repository.PersistedStoryWorldID())
+	require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
+	assert.Equal(t, domain.WorldID("a-world-id"), repository.persistedStory.WorldID())
 }
 
 func TestCreateStory_when_error_happens_persisting_story_it_should_return_internal_error(t *testing.T) {
@@ -141,13 +142,6 @@ func (m *mockRepository) SaveStory(_ context.Context, story *domain.Story) error
 	}
 	m.persistedStory = story
 	return nil
-}
-
-func (m *mockRepository) PersistedStoryWorldID() *string {
-	if m.persistedStory == nil {
-		return nil
-	}
-	return pointerTo(string(m.persistedStory.WorldID()))
 }
 
 func (m *mockRepository) FailOnSaveWith(err error) {
