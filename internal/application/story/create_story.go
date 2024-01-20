@@ -13,14 +13,15 @@ import (
 
 type Repository interface {
 	GetWorldByID(ctx context.Context, worldID domain.WorldID) (*domain.World, error)
+	SaveStory(ctx context.Context, story *domain.Story) error
 }
 
 type CreateStory struct {
-	worldRepository Repository
+	repository Repository
 }
 
-func NewCreateStory(worldRepository Repository) (*CreateStory, error) {
-	return &CreateStory{worldRepository}, nil
+func NewCreateStory(repository Repository) (*CreateStory, error) {
+	return &CreateStory{repository}, nil
 }
 
 func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*StoryDTO, error) {
@@ -32,7 +33,7 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 		return nil, err
 	}
 
-	_, err := c.worldRepository.GetWorldByID(context.Background(), domain.WorldID(req.WorldID))
+	world, err := c.repository.GetWorldByID(context.Background(), domain.WorldID(req.WorldID))
 	if err != nil {
 		if errors.Is(err, domain.ErrWorldDoesNotExist) {
 			return nil, application.ErrWorldDoesNotExist
@@ -40,6 +41,12 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 		log.WithContext(ctx).WithError(err).Error("unexpected error finding world by ID")
 		return nil, application.ErrInternalServer
 	}
+
+	story, err := new(domain.StoryBuilder).
+		WithWorld(world).
+		Build()
+
+	_ = c.repository.SaveStory(ctx, story)
 	return nil, nil
 }
 

@@ -16,7 +16,7 @@ import (
 
 func TestCreateStory_should_require_a_world(t *testing.T) {
 	// Given
-	createStory := newCreateStoryUseCase(t)
+	createStory, _ := newCreateStoryUseCase(t)
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithoutWorld())
@@ -36,7 +36,7 @@ func TestCreateStory_when_specified_party_size(t *testing.T) {
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
 			// Given
-			createStory := newCreateStoryUseCase(t)
+			createStory, _ := newCreateStoryUseCase(t)
 
 			// When
 			_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(tc.partySize))
@@ -49,7 +49,7 @@ func TestCreateStory_when_specified_party_size(t *testing.T) {
 
 func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing.T) {
 	// Given
-	createStory := newCreateStoryUseCase(t)
+	createStory, _ := newCreateStoryUseCase(t)
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("non-existing-world-id"))
@@ -60,7 +60,7 @@ func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing
 
 func TestCreateStory_when_unexpected_error_happens_querying_world_repository_it_should_return_internal_error(t *testing.T) {
 	// Given
-	createStory := newCreateStoryUseCase(t)
+	createStory, _ := newCreateStoryUseCase(t)
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("unexpected-error"))
@@ -69,10 +69,23 @@ func TestCreateStory_when_unexpected_error_happens_querying_world_repository_it_
 	assert.ErrorIs(t, err, application.ErrInternalServer)
 }
 
-func newCreateStoryUseCase(t *testing.T) *story.CreateStory {
-	createStory, err := story.NewCreateStory(new(mockWorldRepository))
+func TestCreateStory_should_persist_a_new_story_with_the_specified_world(t *testing.T) {
+	// Given
+	createStory, repository := newCreateStoryUseCase(t)
+
+	// When
+	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("a-world-id"))
+
+	// Then
 	require.NoError(t, err)
-	return createStory
+	assert.Equal(t, "a-world-id", *repository.PersistedStoryWorldID())
+}
+
+func newCreateStoryUseCase(t *testing.T) (*story.CreateStory, *mockRepository) {
+	repository := new(mockRepository)
+	createStory, err := story.NewCreateStory(repository)
+	require.NoError(t, err)
+	return createStory, repository
 }
 
 func newStoryRequestWithWorldID(worldID string) story.CreateStoryRequest {
@@ -92,10 +105,11 @@ func newStoryRequestWithoutWorld() story.CreateStoryRequest {
 	return story.CreateStoryRequest{}
 }
 
-type mockWorldRepository struct {
+type mockRepository struct {
+	persistedStory *domain.Story
 }
 
-func (m mockWorldRepository) GetWorldByID(_ context.Context, worldID domain.WorldID) (*domain.World, error) {
+func (m *mockRepository) GetWorldByID(_ context.Context, worldID domain.WorldID) (*domain.World, error) {
 	switch worldID {
 	case "unexpected-error":
 		return nil, errors.New("unexpected error")
@@ -106,6 +120,21 @@ func (m mockWorldRepository) GetWorldByID(_ context.Context, worldID domain.Worl
 			WithID(worldID).
 			WithName("a world name").
 			Build(), nil
-
 	}
+}
+
+func (m *mockRepository) SaveStory(_ context.Context, story *domain.Story) error {
+	m.persistedStory = story
+	return nil
+}
+
+func (m *mockRepository) PersistedStoryWorldID() *string {
+	if m.persistedStory == nil {
+		return nil
+	}
+	return pointerTo(string(m.persistedStory.WorldID()))
+}
+
+func pointerTo[T any](value T) *T {
+	return &value
 }
