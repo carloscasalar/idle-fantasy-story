@@ -46,7 +46,10 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 		WithWorld(world).
 		Build()
 
-	_ = c.repository.SaveStory(ctx, story)
+	if err := c.repository.SaveStory(ctx, story); err != nil {
+		log.WithContext(ctx).WithError(err).Error("unexpected error saving story")
+		return nil, application.ErrInternalServer
+	}
 	return nil, nil
 }
 

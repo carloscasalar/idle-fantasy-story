@@ -49,7 +49,8 @@ func TestCreateStory_when_specified_party_size(t *testing.T) {
 
 func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing.T) {
 	// Given
-	createStory, _ := newCreateStoryUseCase(t)
+	createStory, repo := newCreateStoryUseCase(t)
+	repo.FailOnQueryWith(domain.ErrWorldDoesNotExist)
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("non-existing-world-id"))
@@ -60,7 +61,8 @@ func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing
 
 func TestCreateStory_when_unexpected_error_happens_querying_world_repository_it_should_return_internal_error(t *testing.T) {
 	// Given
-	createStory, _ := newCreateStoryUseCase(t)
+	createStory, repo := newCreateStoryUseCase(t)
+	repo.FailOnQueryWith(errors.New("unexpected error"))
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("unexpected-error"))
@@ -79,6 +81,18 @@ func TestCreateStory_should_persist_a_new_story_with_the_specified_world(t *test
 	// Then
 	require.NoError(t, err)
 	assert.Equal(t, "a-world-id", *repository.PersistedStoryWorldID())
+}
+
+func TestCreateStory_when_error_happens_persisting_story_it_should_return_internal_error(t *testing.T) {
+	// Given
+	createStory, repository := newCreateStoryUseCase(t)
+	repository.FailOnSaveWith(errors.New("unexpected error"))
+
+	// When
+	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("a-world-id"))
+
+	// Then
+	assert.ErrorIs(t, err, application.ErrInternalServer)
 }
 
 func newCreateStoryUseCase(t *testing.T) (*story.CreateStory, *mockRepository) {
@@ -107,23 +121,24 @@ func newStoryRequestWithoutWorld() story.CreateStoryRequest {
 
 type mockRepository struct {
 	persistedStory *domain.Story
+	errorOnSave    error
+	errorOnQuery   error
 }
 
 func (m *mockRepository) GetWorldByID(_ context.Context, worldID domain.WorldID) (*domain.World, error) {
-	switch worldID {
-	case "unexpected-error":
-		return nil, errors.New("unexpected error")
-	case "non-existing-world-id":
-		return nil, domain.ErrWorldDoesNotExist
-	default:
-		return new(domain.WorldBuilder).
-			WithID(worldID).
-			WithName("a world name").
-			Build(), nil
+	if m.errorOnQuery != nil {
+		return nil, m.errorOnQuery
 	}
+	return new(domain.WorldBuilder).
+		WithID(worldID).
+		WithName("a world name").
+		Build(), nil
 }
 
 func (m *mockRepository) SaveStory(_ context.Context, story *domain.Story) error {
+	if m.errorOnSave != nil {
+		return m.errorOnSave
+	}
 	m.persistedStory = story
 	return nil
 }
@@ -133,6 +148,14 @@ func (m *mockRepository) PersistedStoryWorldID() *string {
 		return nil
 	}
 	return pointerTo(string(m.persistedStory.WorldID()))
+}
+
+func (m *mockRepository) FailOnSaveWith(err error) {
+	m.errorOnSave = err
+}
+
+func (m *mockRepository) FailOnQueryWith(err error) {
+	m.errorOnQuery = err
 }
 
 func pointerTo[T any](value T) *T {
