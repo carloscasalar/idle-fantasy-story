@@ -1,4 +1,4 @@
-# idle-fantasy-story
+# idle-fantasy-story [![Go Report Card](https://goreportcard.com/badge/github.com/carloscasalar/idle-fantasy-story)](https://goreportcard.com/report/github.com/carloscasalar/idle-fantasy-story)
 This is meant to be a service that generates a random fantasy story. It will stream the story to all clients.
 
 ## Env vars
