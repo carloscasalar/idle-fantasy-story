@@ -25,10 +25,12 @@ func NewCreateStory(repository Repository) (*CreateStory, error) {
 }
 
 func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*StoryDTO, error) {
+	// TODO push into StoryFactory
 	if err := c.validateWorldID(req.WorldID); err != nil {
 		return nil, err
 	}
 
+	// TODO push into StoryFactory
 	if err := c.validatePartySize(req.PartySize); err != nil {
 		return nil, err
 	}
@@ -42,8 +44,9 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 		return nil, application.ErrInternalServer
 	}
 
-	story, err := new(domain.StoryBuilder).
+	story, err := new(domain.StoryFactory).
 		WithWorld(world).
+		WithPartySize(req.PartySize).
 		Build()
 
 	if err := c.repository.SaveStory(ctx, story); err != nil {

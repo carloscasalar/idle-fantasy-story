@@ -5,6 +5,8 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/carloscasalar/idle-fantasy-story/pkg/utils"
+
 	"github.com/carloscasalar/idle-fantasy-story/internal/application"
 
 	"github.com/carloscasalar/idle-fantasy-story/internal/domain"
@@ -13,6 +15,35 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestCreateStory_regarding_party_in_persisted_story(t *testing.T) {
+	numberOfCharactersTestCases := map[string]struct {
+		partySize                  *int
+		expectedNumberOfCharacters int
+	}{
+		"should be 3 when party size is 3":             {utils.PointerTo(3), 3},
+		"should be 4 when party size is not specified": {nil, 4},
+		"should be 4 when party size is 4":             {utils.PointerTo(4), 4},
+		"should be 6 when party size is 5":             {utils.PointerTo(5), 5},
+		"should be 6 when party size is 6":             {utils.PointerTo(6), 6},
+	}
+
+	for name, tc := range numberOfCharactersTestCases {
+		t.Run(name, func(t *testing.T) {
+			// Given
+			createStory, repository := newCreateStoryUseCase(t)
+
+			// When
+			_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(uint8(tc.expectedNumberOfCharacters)))
+
+			// Then
+			require.NoError(t, err)
+			require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
+			party := repository.persistedStory.Party()
+			assert.Len(t, party.Characters(), tc.expectedNumberOfCharacters)
+		})
+	}
+}
 
 func TestCreateStory_should_require_a_world(t *testing.T) {
 	// Given
@@ -150,8 +181,4 @@ func (m *mockRepository) FailOnSaveWith(err error) {
 
 func (m *mockRepository) FailOnQueryWith(err error) {
 	m.errorOnQuery = err
-}
-
-func pointerTo[T any](value T) *T {
-	return &value
 }
