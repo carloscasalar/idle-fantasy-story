@@ -16,7 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateStory_regarding_party_in_persisted_story(t *testing.T) {
+func TestCreateStory_regarding_party_size_in_persisted_story(t *testing.T) {
 	numberOfCharactersTestCases := map[string]struct {
 		partySize                  *int
 		expectedNumberOfCharacters int
@@ -43,44 +43,44 @@ func TestCreateStory_regarding_party_in_persisted_story(t *testing.T) {
 			assert.Len(t, party.Characters(), tc.expectedNumberOfCharacters)
 		})
 	}
+}
 
-	t.Run("every character should have a unique ID", func(t *testing.T) {
-		// Given
-		createStory, repository := newCreateStoryUseCase(t)
+func TestCreateStory_every_character_should_have_a_unique_character_id(t *testing.T) {
+	// Given
+	createStory, repository := newCreateStoryUseCase(t)
 
-		// When
-		_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
+	// When
+	_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
 
-		// Then
-		require.NoError(t, err)
-		require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
-		party := repository.persistedStory.Party()
-		characters := party.Characters()
-		characterIDs := make(map[domain.CharacterID]bool)
-		for _, character := range characters {
-			characterIDs[character.ID()] = true
-		}
-		assert.Len(t, characterIDs, len(characters))
-	})
+	// Then
+	require.NoError(t, err)
+	require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
+	party := repository.persistedStory.Party()
+	characters := party.Characters()
+	characterIDs := make(map[domain.CharacterID]bool)
+	for _, character := range characters {
+		characterIDs[character.ID()] = true
+	}
+	assert.Len(t, characterIDs, 6)
+}
 
-	t.Run("every character should have a unique name", func(t *testing.T) {
-		// Given
-		createStory, repository := newCreateStoryUseCase(t)
+func TestCreateStory_every_character_should_have_a_unique_name(t *testing.T) {
+	// Given
+	createStory, repository := newCreateStoryUseCase(t)
 
-		// When
-		_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
+	// When
+	_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
 
-		// Then
-		require.NoError(t, err)
-		require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
-		party := repository.persistedStory.Party()
-		characters := party.Characters()
-		characterNames := make(map[string]bool)
-		for _, character := range characters {
-			characterNames[character.Name()] = true
-		}
-		assert.Len(t, characterNames, len(characters))
-	})
+	// Then
+	require.NoError(t, err)
+	require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
+	party := repository.persistedStory.Party()
+	characters := party.Characters()
+	characterNames := make(map[string]bool)
+	for _, character := range characters {
+		characterNames[character.Name()] = true
+	}
+	assert.Len(t, characterNames, 6)
 }
 
 func TestCreateStory_should_require_a_world(t *testing.T) {
