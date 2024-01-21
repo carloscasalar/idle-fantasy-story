@@ -62,6 +62,25 @@ func TestCreateStory_regarding_party_in_persisted_story(t *testing.T) {
 		}
 		assert.Len(t, characterIDs, len(characters))
 	})
+
+	t.Run("every character should have a unique name", func(t *testing.T) {
+		// Given
+		createStory, repository := newCreateStoryUseCase(t)
+
+		// When
+		_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
+
+		// Then
+		require.NoError(t, err)
+		require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
+		party := repository.persistedStory.Party()
+		characters := party.Characters()
+		characterNames := make(map[string]bool)
+		for _, character := range characters {
+			characterNames[character.Name()] = true
+		}
+		assert.Len(t, characterNames, len(characters))
+	})
 }
 
 func TestCreateStory_should_require_a_world(t *testing.T) {

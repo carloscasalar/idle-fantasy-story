@@ -46,7 +46,10 @@ func generateCharacters(size uint8) ([]Character, error) {
 	characters := make([]Character, size)
 	for i := range characters {
 		id := CharacterID(fmt.Sprintf("character-%d", i))
-		character, err := new(CharacterBuilder).WithID(id).Build()
+		character, err := new(CharacterBuilder).
+			WithID(id).
+			WithName(fmt.Sprintf("Character %d", i)).
+			Build()
 		if err != nil {
 			return nil, err
 		}
