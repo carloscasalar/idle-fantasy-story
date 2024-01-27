@@ -9,8 +9,12 @@ func (s *Story) WorldID() WorldID {
 	return s.world.ID()
 }
 
-func (s *Story) Party() Party {
-	return s.party
+func (s *Story) PartySize() int {
+	return s.party.Size()
+}
+
+func (s *Story) Characters() []Character {
+	return s.party.Characters()
 }
 
 type StoryBuilder struct {

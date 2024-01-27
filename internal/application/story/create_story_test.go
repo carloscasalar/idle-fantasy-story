@@ -3,6 +3,7 @@ package story_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 
 	"github.com/carloscasalar/idle-fantasy-story/pkg/utils"
@@ -39,8 +40,8 @@ func TestCreateStory_regarding_party_size_in_persisted_story(t *testing.T) {
 			// Then
 			require.NoError(t, err)
 			require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
-			party := repository.persistedStory.Party()
-			assert.Len(t, party.Characters(), tc.expectedNumberOfCharacters)
+			characters := repository.persistedStory.Characters()
+			assert.Len(t, characters, tc.expectedNumberOfCharacters)
 		})
 	}
 }
@@ -55,8 +56,7 @@ func TestCreateStory_every_character_should_have_a_unique_character_id(t *testin
 	// Then
 	require.NoError(t, err)
 	require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
-	party := repository.persistedStory.Party()
-	characters := party.Characters()
+	characters := repository.persistedStory.Characters()
 	characterIDs := make(map[domain.CharacterID]bool)
 	for _, character := range characters {
 		characterIDs[character.ID()] = true
@@ -64,23 +64,24 @@ func TestCreateStory_every_character_should_have_a_unique_character_id(t *testin
 	assert.Len(t, characterIDs, 6)
 }
 
-func TestCreateStory_every_character_should_have_a_unique_name(t *testing.T) {
-	// Given
-	createStory, repository := newCreateStoryUseCase(t)
+func TestCreateStory_for_a_party_of_6_character(t *testing.T) {
+	for i := 0; i < 6; i++ {
+		t.Run(fmt.Sprintf("character at %d position should have non empty name", i+1), func(t *testing.T) {
+			// Given
+			createStory, repository := newCreateStoryUseCase(t)
 
-	// When
-	_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
+			// When
+			_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
 
-	// Then
-	require.NoError(t, err)
-	require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
-	party := repository.persistedStory.Party()
-	characters := party.Characters()
-	characterNames := make(map[string]bool)
-	for _, character := range characters {
-		characterNames[character.Name()] = true
+			// Then
+			require.NoError(t, err)
+			persistedStory := repository.persistedStory
+			require.NotNil(t, persistedStory, "persisted story should not be nil")
+			require.Equal(t, 6, persistedStory.PartySize())
+			character := persistedStory.Characters()[i]
+			assert.NotEmpty(t, character.Name())
+		})
 	}
-	assert.Len(t, characterNames, 6)
 }
 
 func TestCreateStory_should_require_a_world(t *testing.T) {
@@ -98,8 +99,8 @@ func TestCreateStory_when_specified_party_size(t *testing.T) {
 	testCases := map[string]struct {
 		partySize uint8
 	}{
-		"should not be less than 3":    {2},
-		"should not be greater than 6": {7},
+		"should require party size not be less than 3":    {2},
+		"should require party size not be greater than 6": {7},
 	}
 
 	for name, tc := range testCases {
