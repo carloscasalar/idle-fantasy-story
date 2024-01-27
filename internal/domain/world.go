@@ -5,8 +5,9 @@ type WorldID string
 
 // World represents a world in the game
 type World struct {
-	id   WorldID
-	name string
+	id      WorldID
+	name    string
+	species []Species
 }
 
 func (w World) Name() string {
@@ -17,24 +18,35 @@ func (w World) ID() WorldID {
 	return w.id
 }
 
-type WorldBuilder struct {
-	id   *WorldID
-	name *string
+func (w World) Species() []Species {
+	return w.species
 }
 
-func (wb WorldBuilder) WithID(id WorldID) WorldBuilder {
+type WorldBuilder struct {
+	id      *WorldID
+	name    *string
+	species []Species
+}
+
+func (wb *WorldBuilder) WithID(id WorldID) *WorldBuilder {
 	wb.id = &id
 	return wb
 }
 
-func (wb WorldBuilder) WithName(name string) WorldBuilder {
+func (wb *WorldBuilder) WithName(name string) *WorldBuilder {
 	wb.name = &name
 	return wb
 }
 
-func (wb WorldBuilder) Build() *World {
+func (wb *WorldBuilder) WithSpecies(species []Species) *WorldBuilder {
+	wb.species = species
+	return wb
+}
+
+func (wb *WorldBuilder) Build() *World {
 	return &World{
-		id:   *wb.id,
-		name: *wb.name,
+		id:      *wb.id,
+		name:    *wb.name,
+		species: wb.species,
 	}
 }

@@ -2,5 +2,7 @@
 worlds:
   - id: "aebrynis"
     name: "Aebrynis"
+    species: ["human", "elf", "dwarf", "halfing", "gnome"]
   - id: "krynn"
     name: "Krynn"
+    species: ["human", "elf", "dwarf", "kender", "gnome"]

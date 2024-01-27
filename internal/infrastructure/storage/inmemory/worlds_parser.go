@@ -1,6 +1,7 @@
 package inmemory
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -16,14 +17,18 @@ func newWorldsLoader(worldsFilePath string) *worldsLoader {
 	return &worldsLoader{worldsFilePath: worldsFilePath}
 }
 
-func (wl *worldsLoader) load() (map[string]domain.World, error) {
+func (wl *worldsLoader) load(ctx context.Context) (map[string]domain.World, error) {
 	rawWorlds, err := wl.parseYmlWorlds()
 	if err != nil {
 		return nil, fmt.Errorf("error parsing yml worlds: %w", err)
 	}
 	worlds := make(map[string]domain.World, len(rawWorlds))
 	for _, world := range rawWorlds {
-		worlds[world.ID] = world.toDomain()
+		mappedWorld, err := world.toDomain(ctx)
+		if err != nil {
+			return nil, err
+		}
+		worlds[world.ID] = *mappedWorld
 	}
 	return worlds, nil
 }
