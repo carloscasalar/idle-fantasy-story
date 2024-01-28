@@ -11,8 +11,10 @@ You can have a full list of commands by running `make help`.
 We use `revive` for linting.
 
 ## Generating the mock code
-We use [mockery](https://vektra.github.io/mockery/latest) to generate the mock code.
-Follow the instructions in the mockery documentation to install it.
+Just because the main reason this project exists is to learn, we also have places were we experiment
+with different mocking approaches. In some places we use the well known 
+[mockery](https://vektra.github.io/mockery/latest) lib to generate the mock code (Follow the instructions in the 
+mockery documentation to install it). In other places we use manual mocks for the sake of learning and experimenting.
 
 ## Modifying the gRPC code
 The gRPC code is located in the `api/proto` directory. You can modify the `.proto` files in this directory according to your needs.

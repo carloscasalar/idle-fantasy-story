@@ -119,8 +119,7 @@ func TestCreateStory_when_specified_party_size(t *testing.T) {
 
 func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing.T) {
 	// Given
-	createStory, repo := newCreateStoryUseCase(t)
-	repo.FailOnQueryWith(domain.ErrWorldDoesNotExist)
+	createStory, _ := newCreateStoryUseCase(t, withErrorOnQueryStory(domain.ErrWorldDoesNotExist))
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("non-existing-world-id"))
@@ -131,8 +130,7 @@ func TestCreateStory_when_world_does_not_exist_it_should_return_error(t *testing
 
 func TestCreateStory_when_unexpected_error_happens_querying_world_repository_it_should_return_internal_error(t *testing.T) {
 	// Given
-	createStory, repo := newCreateStoryUseCase(t)
-	repo.FailOnQueryWith(errors.New("unexpected error"))
+	createStory, _ := newCreateStoryUseCase(t, withErrorOnQueryStory(errors.New("unexpected error")))
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("unexpected-error"))
@@ -156,8 +154,7 @@ func TestCreateStory_should_persist_a_new_story_with_the_specified_world(t *test
 
 func TestCreateStory_when_error_happens_persisting_story_it_should_return_internal_error(t *testing.T) {
 	// Given
-	createStory, repository := newCreateStoryUseCase(t)
-	repository.FailOnSaveWith(errors.New("unexpected error"))
+	createStory, _ := newCreateStoryUseCase(t, withErrorOnSaveStory(errors.New("unexpected error")))
 
 	// When
 	_, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("a-world-id"))
@@ -172,7 +169,11 @@ func newCreateStoryUseCase(t *testing.T, opts ...mocksOption) (*story.CreateStor
 		opt(&options)
 	}
 
-	repository := new(mockRepository)
+	repository := &mockRepository{
+		persistedStory: nil,
+		errorOnSave:    options.errorOnSaveStory,
+		errorOnQuery:   options.errorOnQueryStory,
+	}
 	nameGenerator := &mockNameGenerator{names: options.namesToGenerate}
 	createStory, err := story.NewCreateStory(repository, nameGenerator)
 	require.NoError(t, err)
@@ -197,7 +198,9 @@ func newStoryRequestWithoutWorld() story.CreateStoryRequest {
 }
 
 type mocksSettings struct {
-	namesToGenerate []string
+	namesToGenerate   []string
+	errorOnSaveStory  error
+	errorOnQueryStory error
 }
 
 type mocksOption func(settings *mocksSettings)
@@ -205,6 +208,18 @@ type mocksOption func(settings *mocksSettings)
 func withNamesToGenerate(names []string) mocksOption {
 	return func(settings *mocksSettings) {
 		settings.namesToGenerate = names
+	}
+}
+
+func withErrorOnSaveStory(err error) mocksOption {
+	return func(settings *mocksSettings) {
+		settings.errorOnSaveStory = err
+	}
+}
+
+func withErrorOnQueryStory(err error) mocksOption {
+	return func(settings *mocksSettings) {
+		settings.errorOnQueryStory = err
 	}
 }
 
@@ -230,14 +245,6 @@ func (m *mockRepository) SaveStory(_ context.Context, story *domain.Story) error
 	}
 	m.persistedStory = story
 	return nil
-}
-
-func (m *mockRepository) FailOnSaveWith(err error) {
-	m.errorOnSave = err
-}
-
-func (m *mockRepository) FailOnQueryWith(err error) {
-	m.errorOnQuery = err
 }
 
 type mockNameGenerator struct {
