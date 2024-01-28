@@ -15,13 +15,17 @@ type Repository interface {
 	GetWorldByID(ctx context.Context, worldID domain.WorldID) (*domain.World, error)
 	SaveStory(ctx context.Context, story *domain.Story) error
 }
-
-type CreateStory struct {
-	repository Repository
+type NameGenerator interface {
+	GenerateCharacterName(species domain.Species) string
 }
 
-func NewCreateStory(repository Repository) (*CreateStory, error) {
-	return &CreateStory{repository}, nil
+type CreateStory struct {
+	repository    Repository
+	nameGenerator NameGenerator
+}
+
+func NewCreateStory(repository Repository, nameGenerator NameGenerator) (*CreateStory, error) {
+	return &CreateStory{repository, nameGenerator}, nil
 }
 
 func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*StoryDTO, error) {

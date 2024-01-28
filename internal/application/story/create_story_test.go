@@ -166,9 +166,15 @@ func TestCreateStory_when_error_happens_persisting_story_it_should_return_intern
 	assert.ErrorIs(t, err, application.ErrInternalServer)
 }
 
-func newCreateStoryUseCase(t *testing.T) (*story.CreateStory, *mockRepository) {
+func newCreateStoryUseCase(t *testing.T, opts ...mocksOption) (*story.CreateStory, *mockRepository) {
+	options := mocksSettings{}
+	for _, opt := range opts {
+		opt(&options)
+	}
+
 	repository := new(mockRepository)
-	createStory, err := story.NewCreateStory(repository)
+	nameGenerator := &mockNameGenerator{names: options.namesToGenerate}
+	createStory, err := story.NewCreateStory(repository, nameGenerator)
 	require.NoError(t, err)
 	return createStory, repository
 }
@@ -188,6 +194,18 @@ func newStoryRequestWithNumberOfCharacters(numberOfCharacters uint8) story.Creat
 
 func newStoryRequestWithoutWorld() story.CreateStoryRequest {
 	return story.CreateStoryRequest{}
+}
+
+type mocksSettings struct {
+	namesToGenerate []string
+}
+
+type mocksOption func(settings *mocksSettings)
+
+func withNamesToGenerate(names []string) mocksOption {
+	return func(settings *mocksSettings) {
+		settings.namesToGenerate = names
+	}
 }
 
 type mockRepository struct {
@@ -220,4 +238,18 @@ func (m *mockRepository) FailOnSaveWith(err error) {
 
 func (m *mockRepository) FailOnQueryWith(err error) {
 	m.errorOnQuery = err
+}
+
+type mockNameGenerator struct {
+	names         []string
+	nextNameIndex *int
+}
+
+func (m *mockNameGenerator) GenerateCharacterName(_ domain.Species) string {
+	if len(m.names) == 0 {
+		return ""
+	}
+	nameIndex := utils.NoNilValue(m.nextNameIndex, 0)
+	m.nextNameIndex = utils.PointerTo(nameIndex + 1)
+	return m.names[nameIndex]
 }
