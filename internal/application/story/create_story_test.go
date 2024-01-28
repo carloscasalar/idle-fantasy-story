@@ -65,10 +65,11 @@ func TestCreateStory_every_character_should_have_a_unique_character_id(t *testin
 }
 
 func TestCreateStory_for_a_party_of_6_character(t *testing.T) {
-	for i := 0; i < 6; i++ {
-		t.Run(fmt.Sprintf("character at %d position should have non empty name", i+1), func(t *testing.T) {
+	namesToGenerate := []string{"name 1", "name 2", "name 3", "name 4", "name 5", "name 6"}
+	for i, expectedName := range namesToGenerate {
+		t.Run(fmt.Sprintf("character at %d position should have been generated with '%v' name", i+1, expectedName), func(t *testing.T) {
 			// Given
-			createStory, repository := newCreateStoryUseCase(t)
+			createStory, repository := newCreateStoryUseCase(t, withNamesToGenerate(namesToGenerate))
 
 			// When
 			_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
@@ -79,7 +80,7 @@ func TestCreateStory_for_a_party_of_6_character(t *testing.T) {
 			require.NotNil(t, persistedStory, "persisted story should not be nil")
 			require.Equal(t, 6, persistedStory.PartySize())
 			character := persistedStory.Characters()[i]
-			assert.NotEmpty(t, character.Name())
+			assert.Equal(t, expectedName, character.Name())
 		})
 	}
 }

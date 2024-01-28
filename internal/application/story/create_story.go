@@ -49,6 +49,7 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 	}
 
 	story, err := new(domain.StoryFactory).
+		WithNameGenerator(c.nameGenerator).
 		WithWorld(world).
 		WithPartySize(req.PartySize).
 		Build()
