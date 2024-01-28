@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"math/rand"
 
 	"github.com/carloscasalar/idle-fantasy-story/pkg/utils"
 )
@@ -49,11 +50,17 @@ func (sb *StoryFactory) Build() (*Story, error) {
 }
 
 func (sb *StoryFactory) generateCharacters(size uint8) ([]Character, error) {
+	worldSpecies := sb.world.Species()
+	if len(worldSpecies) == 0 {
+		return nil, NewUnexpectedError("world has no species")
+	}
 	characters := make([]Character, size)
 	for i := range characters {
 		id := CharacterID(fmt.Sprintf("character-%d", i))
+		species := randomSpecies(worldSpecies)
 		character, err := new(CharacterBuilder).
 			WithID(id).
+			WithSpecies(species).
 			WithName(sb.nameGenerator.GenerateCharacterName(SpeciesHuman)).
 			Build()
 		if err != nil {
@@ -62,4 +69,9 @@ func (sb *StoryFactory) generateCharacters(size uint8) ([]Character, error) {
 		characters[i] = *character
 	}
 	return characters, nil
+}
+
+func randomSpecies(species []Species) Species {
+	randomSpeciesIndex := rand.Intn(len(species))
+	return species[randomSpeciesIndex]
 }

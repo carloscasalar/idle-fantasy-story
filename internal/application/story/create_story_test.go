@@ -85,6 +85,34 @@ func TestCreateStory_for_a_party_of_6_character(t *testing.T) {
 	}
 }
 
+func TestCreateStory_all_characters_should_have_a_species_from_the_world(t *testing.T) {
+	// Given
+	worldSpecies := []domain.Species{domain.SpeciesElf, domain.SpeciesDwarf}
+	createStory, repository := newCreateStoryUseCase(t, withWorldSpecies(worldSpecies))
+
+	// When
+	_, err := createStory.Execute(context.Background(), newStoryRequestWithNumberOfCharacters(6))
+
+	// Then
+	require.NoError(t, err)
+	require.NotNil(t, repository.persistedStory, "persisted story should not be nil")
+	characters := repository.persistedStory.Characters()
+	require.Len(t, characters, 6)
+	for i, character := range characters {
+		assert.NotEmpty(t, character.Species(), fmt.Sprintf("character at %d position should have a species", i+1))
+		assert.NoError(t, verifyCharacterAtPosHasAnyOfExpectedSpecies(i+1, character.Species(), domain.SpeciesElf, domain.SpeciesDwarf))
+	}
+}
+
+func verifyCharacterAtPosHasAnyOfExpectedSpecies(position int, current domain.Species, expectedSpecies ...domain.Species) error {
+	for _, expected := range expectedSpecies {
+		if current == expected {
+			return nil
+		}
+	}
+	return fmt.Errorf("expected species to be one of %v but was %v for character at position %d", expectedSpecies, current, position)
+}
+
 func TestCreateStory_should_require_a_world(t *testing.T) {
 	// Given
 	createStory, _ := newCreateStoryUseCase(t)
@@ -170,8 +198,11 @@ func newCreateStoryUseCase(t *testing.T, opts ...mocksOption) (*story.CreateStor
 		opt(&options)
 	}
 
+	defaultSpecies := []domain.Species{domain.SpeciesHuman}
+
 	repository := &mockRepository{
 		persistedStory: nil,
+		worldSpecies:   utils.NoEmptySlice(options.worldSpecies, defaultSpecies),
 		errorOnSave:    options.errorOnSaveStory,
 		errorOnQuery:   options.errorOnQueryStory,
 	}
@@ -200,6 +231,7 @@ func newStoryRequestWithoutWorld() story.CreateStoryRequest {
 
 type mocksSettings struct {
 	namesToGenerate   []string
+	worldSpecies      []domain.Species
 	errorOnSaveStory  error
 	errorOnQueryStory error
 }
@@ -209,6 +241,12 @@ type mocksOption func(settings *mocksSettings)
 func withNamesToGenerate(names []string) mocksOption {
 	return func(settings *mocksSettings) {
 		settings.namesToGenerate = names
+	}
+}
+
+func withWorldSpecies(species []domain.Species) mocksOption {
+	return func(settings *mocksSettings) {
+		settings.worldSpecies = species
 	}
 }
 
@@ -226,6 +264,7 @@ func withErrorOnQueryStory(err error) mocksOption {
 
 type mockRepository struct {
 	persistedStory *domain.Story
+	worldSpecies   []domain.Species
 	errorOnSave    error
 	errorOnQuery   error
 }
@@ -236,6 +275,7 @@ func (m *mockRepository) GetWorldByID(_ context.Context, worldID domain.WorldID)
 	}
 	return new(domain.WorldBuilder).
 		WithID(worldID).
+		WithSpecies(m.worldSpecies).
 		WithName("a world name").
 		Build(), nil
 }
