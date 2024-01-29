@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"github.com/google/uuid"
+
 	"github.com/carloscasalar/idle-fantasy-story/pkg/utils"
 )
 
@@ -34,16 +36,25 @@ func (sb *StoryFactory) Build() (*Story, error) {
 	if sb.world == nil {
 		return nil, NewUnexpectedError("world is required to build a story")
 	}
+
 	partySize := utils.NoNilValue(sb.partySize, defaultPartySize)
 	characters, err := sb.generateCharacters(partySize)
 	if err != nil {
 		return nil, err
 	}
+
 	party, err := NewParty(characters)
 	if err != nil {
 		return nil, err
 	}
+
+	storyID, err := generateStoryID()
+	if err != nil {
+		return nil, err
+	}
+
 	return new(StoryBuilder).
+		WithID(*storyID).
 		WithWorld(sb.world).
 		WithParty(party).
 		Build()
@@ -74,4 +85,13 @@ func (sb *StoryFactory) generateCharacters(size uint8) ([]Character, error) {
 func randomSpecies(species []Species) Species {
 	randomSpeciesIndex := rand.Intn(len(species))
 	return species[randomSpeciesIndex]
+}
+
+func generateStoryID() (*StoryID, error) {
+	storyUUID, err := uuid.NewRandom()
+	if err != nil {
+		return nil, NewUnexpectedError("error generating story id")
+	}
+	storyID := StoryID(storyUUID.String())
+	return &storyID, nil
 }

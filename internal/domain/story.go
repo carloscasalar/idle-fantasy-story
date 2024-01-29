@@ -1,8 +1,15 @@
 package domain
 
+type StoryID string
+
 type Story struct {
+	id    StoryID
 	world World
 	party Party
+}
+
+func (s *Story) ID() StoryID {
+	return s.id
 }
 
 func (s *Story) WorldID() WorldID {
@@ -18,8 +25,14 @@ func (s *Story) Characters() []Character {
 }
 
 type StoryBuilder struct {
+	id    *StoryID
 	world *World
 	party *Party
+}
+
+func (sb *StoryBuilder) WithID(id StoryID) *StoryBuilder {
+	sb.id = &id
+	return sb
 }
 
 func (sb *StoryBuilder) WithWorld(world *World) *StoryBuilder {
@@ -33,6 +46,9 @@ func (sb *StoryBuilder) WithParty(party *Party) *StoryBuilder {
 }
 
 func (sb *StoryBuilder) Build() (*Story, error) {
+	if sb.id == nil {
+		return nil, NewUnexpectedError("story id is required to build a story")
+	}
 	if sb.world == nil {
 		return nil, NewUnexpectedError("world is required to build a story")
 	}
@@ -40,6 +56,7 @@ func (sb *StoryBuilder) Build() (*Story, error) {
 		return nil, NewUnexpectedError("party is required to build a story")
 	}
 	return &Story{
+		id:    *sb.id,
 		world: *sb.world,
 		party: *sb.party,
 	}, nil
