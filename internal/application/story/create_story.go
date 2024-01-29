@@ -62,7 +62,13 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 		log.WithContext(ctx).WithError(err).Error("unexpected error saving story")
 		return nil, application.ErrInternalServer
 	}
-	return nil, nil
+	return mapToDTO(story), nil
+}
+
+func mapToDTO(story *domain.Story) *StoryDTO {
+	return &StoryDTO{
+		WorldID: string(story.WorldID()),
+	}
 }
 
 func (c *CreateStory) validateWorldID(id string) error {
