@@ -61,7 +61,7 @@ func (sb *StoryFactory) generateCharacters(size uint8) ([]Character, error) {
 		character, err := new(CharacterBuilder).
 			WithID(id).
 			WithSpecies(species).
-			WithName(sb.nameGenerator.GenerateCharacterName(SpeciesHuman)).
+			WithName(sb.nameGenerator.GenerateCharacterName(species)).
 			Build()
 		if err != nil {
 			return nil, err
