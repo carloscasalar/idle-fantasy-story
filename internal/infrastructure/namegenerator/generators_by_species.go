@@ -41,7 +41,11 @@ func newGenericNameGenerator() (*genericNameGenerator, error) {
 }
 
 func (g *genericNameGenerator) GenerateName() string {
-	name := g.upperCaser.String(g.nameGenerator.String())
-	surname := g.upperCaser.String(g.surnameGenerator.String())
+	name := g.toUpperCase(g.nameGenerator.String())
+	surname := g.toUpperCase(g.surnameGenerator.String())
 	return fmt.Sprintf("%s %s", name, surname)
+}
+
+func (g *genericNameGenerator) toUpperCase(value string) string {
+	return g.upperCaser.String(value)
 }
