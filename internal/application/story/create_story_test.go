@@ -130,18 +130,6 @@ func TestCreateStory_all_character_names_should_be_generated_using_the_character
 	nameGenerator.assertGenerateCharacterNameNthCallCalledWithSpecies(t, 3, domain.SpeciesGnome)
 }
 
-func TestCreateStory_should_map_world_id_of_the_persisted_story(t *testing.T) {
-	// Given
-	createStory, _, _ := newCreateStoryUseCase(t)
-
-	// When
-	dto, err := createStory.Execute(context.Background(), newStoryRequestWithWorldID("a-world-id"))
-
-	// Then
-	require.NoError(t, err)
-	assert.Equal(t, "a-world-id", dto.WorldID)
-}
-
 func TestCreateStory_should_map_the_story_id(t *testing.T) {
 	// Given
 	createStory, repository, _ := newCreateStoryUseCase(t)

@@ -67,8 +67,7 @@ func (c *CreateStory) Execute(ctx context.Context, req CreateStoryRequest) (*Sto
 
 func mapToDTO(story *domain.Story) *StoryDTO {
 	return &StoryDTO{
-		ID:      string(story.ID()),
-		WorldID: string(story.WorldID()),
+		ID: string(story.ID()),
 	}
 }
 
