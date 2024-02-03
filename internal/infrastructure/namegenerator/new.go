@@ -6,7 +6,12 @@ type RandomNameGenerator struct {
 }
 
 func (r *RandomNameGenerator) GenerateCharacterName(_ domain.Species) string {
-	return "a name"
+	name, err := generateGenericName()
+	if err != nil {
+		return err.Error()
+	}
+
+	return name
 }
 
 func New() *RandomNameGenerator {
