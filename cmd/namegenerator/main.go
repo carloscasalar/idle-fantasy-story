@@ -9,9 +9,14 @@ import (
 
 // Just a simple example of how to use the name generator package
 func main() {
-	generator := namegenerator.New()
+	generator, err := namegenerator.New()
+	if err != nil {
+		panic(fmt.Errorf("unable to instantiate name generator: %w", err))
+	}
 
-	name := generator.GenerateCharacterName(domain.SpeciesHuman)
+	for i := 0; i < 10; i++ {
+		name := generator.GenerateCharacterName(domain.SpeciesHuman)
+		println(fmt.Sprintf("Generated name (%d): %s", i+1, name))
 
-	println(fmt.Sprintf("Generated name: %s", name))
+	}
 }

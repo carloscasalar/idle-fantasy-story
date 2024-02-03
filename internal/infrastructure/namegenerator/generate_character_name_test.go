@@ -3,6 +3,8 @@ package namegenerator_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/require"
+
 	"github.com/carloscasalar/idle-fantasy-story/internal/domain"
 	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/namegenerator"
 	"github.com/stretchr/testify/assert"
@@ -22,7 +24,8 @@ func Test_RandomNameGenerator_GenerateCharacterName(t *testing.T) {
 
 	for assertion, tc := range testCases {
 		t.Run(assertion, func(t *testing.T) {
-			generator := namegenerator.New()
+			generator, err := namegenerator.New()
+			require.NoError(t, err)
 
 			name := generator.GenerateCharacterName(tc.species)
 
