@@ -53,6 +53,9 @@ run-docker: ## Runs the api inside docker
                --env API_MEMORYSTORAGE_WORLDSFILEPATH="/go/bin/data/worlds.yml" \
                $(DOCKER_REPO):$(DOCKER_TAG)
 
+generate-names: ## Generates sample names for the selected species
+	@go run cmd/namegenerator/main.go
+
 coverage: out/report.json ## Displays coverage per func on cli
 	@go tool cover -func=out/cover.out
 

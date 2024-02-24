@@ -2,12 +2,22 @@ package namegenerator
 
 import "github.com/carloscasalar/idle-fantasy-story/internal/domain"
 
-type RandomNameGenerator struct {
-	generator *genericNameGenerator
+type NameGenerator interface {
+	GenerateName() string
 }
 
-func (r *RandomNameGenerator) GenerateCharacterName(_ domain.Species) string {
-	return r.generator.GenerateName()
+type RandomNameGenerator struct {
+	generatorBySpecies map[domain.Species]NameGenerator
+	defaultGenerator   *genericNameGenerator
+}
+
+func (r *RandomNameGenerator) GenerateCharacterName(species domain.Species) string {
+	generator, found := r.generatorBySpecies[species]
+	if !found {
+		generator = r.defaultGenerator
+	}
+
+	return generator.GenerateName()
 }
 
 func New() (*RandomNameGenerator, error) {
@@ -15,7 +25,18 @@ func New() (*RandomNameGenerator, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	elfGenerator, err := newElfNameGenerator()
+	if err != nil {
+		return nil, err
+	}
+
+	generatorBySpecies := map[domain.Species]NameGenerator{
+		domain.SpeciesElf: elfGenerator,
+	}
+
 	return &RandomNameGenerator{
-		generator: generator,
+		generatorBySpecies: generatorBySpecies,
+		defaultGenerator:   generator,
 	}, nil
 }
