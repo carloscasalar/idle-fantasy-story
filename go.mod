@@ -3,7 +3,7 @@ module github.com/carloscasalar/idle-fantasy-story
 go 1.21.5
 
 require (
-	connectrpc.com/connect v1.15.0
+	connectrpc.com/connect v1.16.2
 	connectrpc.com/grpcreflect v1.2.0
 	github.com/carloscasalar/idle-fantasy-story/pkg/idlefantasystory v0.0.0-20240113181302-9eec988ddbce
 	github.com/gin-gonic/gin v1.9.1
