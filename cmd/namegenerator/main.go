@@ -2,20 +2,16 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"github.com/carloscasalar/idle-fantasy-story/internal/application/generate"
 	"os"
 
 	"github.com/carloscasalar/idle-fantasy-story/internal/domain"
-	"github.com/carloscasalar/idle-fantasy-story/internal/infrastructure/namegenerator"
 )
 
 // Just a simple example of how to use the name generator package
 func main() {
-	generator, err := namegenerator.New()
-	if err != nil {
-		panic(fmt.Errorf("unable to instantiate name generator: %w", err))
-	}
-
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("Please, choose a species to generate 10 names for it:")
@@ -39,9 +35,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	for i := 0; i < 10; i++ {
-		name := generator.GenerateCharacterName(species)
-		println(fmt.Sprintf("Generated name (%d): %s", i+1, name))
-
+	generateNames, err := generate.NewNames()
+	if err != nil {
+		println(fmt.Errorf("unable to instantiate name generator: %w", err))
+		os.Exit(1)
 	}
+	names := generateNames.Execute(context.Background(), species, 10)
+	for i, name := range names {
+		println(fmt.Sprintf("Generated name (%d): %s", i+1, name))
+	}
+
 }
