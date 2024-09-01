@@ -1,6 +1,7 @@
 module github.com/carloscasalar/idle-fantasy-story
 
 go 1.21.5
+toolchain go1.22.5
 
 require (
 	connectrpc.com/connect v1.16.2
@@ -9,7 +10,7 @@ require (
 	github.com/gin-gonic/gin v1.10.0
 	github.com/google/uuid v1.6.0
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/s0rg/fantasyname v1.3.4
+	github.com/s0rg/fantasyname v1.3.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.9.0
 	golang.org/x/net v0.27.0
