@@ -4,7 +4,7 @@ go 1.21.5
 toolchain go1.22.5
 
 require (
-	connectrpc.com/connect v1.17.0
+	connectrpc.com/connect v1.18.1
 	connectrpc.com/grpcreflect v1.2.0
 	github.com/carloscasalar/idle-fantasy-story/pkg/idlefantasystory v0.0.0-20240113181302-9eec988ddbce
 	github.com/gin-gonic/gin v1.10.0
